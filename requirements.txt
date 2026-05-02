@@ -5,3 +5,6 @@ langchain_groq
 python-dotenv
 groq
 ipykernel
+mysql-connector-python
+pydantic
+streamlit
