@@ -1,33 +1,36 @@
 from mysql import connector
 from dotenv import load_dotenv
 import os
+from .utils import logger
 
 #load the environment variables from .env file
 load_dotenv()
-DB_HOST=os.getenv("DB_HOST")
-DB_USER=os.getenv("DB_USER")
-DB_PASSWORD=os.getenv("DB_PASSWORD")
-DB_NAME=os.getenv("DB_NAME")
-
-#create the connection to the database
 class DatabaseConnection:
-    def get_connection(self):
+    def __init__(self):
+        self.DB_HOST=os.getenv("DB_HOST")
+        self.DB_USER=os.getenv("DB_USER")
+        self.DB_PASSWORD=os.getenv("DB_PASSWORD")
+        self.DB_NAME=os.getenv("DB_NAME")
+
         try:
-            connection=connector.connect(
-                host=DB_HOST,
-                user=DB_USER,
-                password=DB_PASSWORD,
-                database=DB_NAME)
-            return True, connection
+            self.connection=connector.connect(
+                host=self.DB_HOST,
+                user=self.DB_USER,
+                password=self.DB_PASSWORD,
+                database=self.DB_NAME)
+            logger.info("Database connection established successfully")
         except Exception as e:
-            return False, str(e)
+            self.connection=None
+            logger.error(f"Failed to connect to the database. Please check the credentials and database status.Error:{str(e)}")    
         
-    def execute_query(self, connection,query):            
-        try:
-            cursor=connection.cursor()
-            cursor.execute(query)
-            rows=cursor.fetchall()
-            return True, rows
-        except Exception as e:
-            return False, str(e)
+    def execute_query(self,query):            
+        if self.connection is not None:
+            try:
+                cursor=self.connection.cursor()
+                cursor.execute(query)
+                rows=cursor.fetchall()
+                return True, rows
+            except Exception as e:
+                logger.error(f"Failed to execute the query. Error:{str(e)}")
+                return False, str(e)
         return False, "Failed to connect to database"

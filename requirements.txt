@@ -8,3 +8,5 @@ ipykernel
 mysql-connector-python
 pydantic
 streamlit
+python-box
+plotly
